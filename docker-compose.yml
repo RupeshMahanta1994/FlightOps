@@ -1,0 +1,17 @@
+services:
+
+  frontend
+
+  gateway
+
+  booking-service
+
+  checkin-service
+
+  notification-service
+
+  audit-service
+
+  postgres
+
+  rabbitmq
