@@ -105,3 +105,8 @@ func (s *bookingService) DeleteBooking(id string) error {
 	s.log.Info("deleting booking", "booking_id", id)
 	return s.repo.Delete(context.Background(), uuid)
 }
+
+func (s *bookingService) ListAllBookings() ([]dto.BookingResponse, error) {
+	s.log.Info("listing all bookings")
+	return s.repo.ListAllBookings(context.Background())
+}

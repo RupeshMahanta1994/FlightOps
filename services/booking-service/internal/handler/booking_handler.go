@@ -113,3 +113,17 @@ func (h *bookingHandler) DeleteBooking(c *fiber.Ctx) error {
 	requestLog.Info("booking deleted", "booking_id", id)
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func (h *bookingHandler) ListAllBookings(c *fiber.Ctx) error {
+	requestLog := logger.WithRequestID(h.log, c.Get(fiber.HeaderXRequestID))
+	requestLog.Info("listing all bookings")
+
+	bookings, err := h.bookingService.ListAllBookings()
+	if err != nil {
+		h.log.Error("failed to list bookings", "error", err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	requestLog.Info("bookings listed", "count", len(bookings))
+	return c.JSON(bookings)
+}

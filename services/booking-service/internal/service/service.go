@@ -7,4 +7,5 @@ type BookingService interface {
 	GetBookingByID(id string) (dto.BookingResponse, error)
 	UpdateBooking(id, passengerName, flightNumber, source, destination, status string) (*dto.BookingResponse, error)
 	DeleteBooking(id string) error
+	ListAllBookings() ([]dto.BookingResponse, error)
 }

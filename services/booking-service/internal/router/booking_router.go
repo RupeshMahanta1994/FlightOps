@@ -11,6 +11,7 @@ type BookingHandler interface {
 	GetBookingByID(*fiber.Ctx) error
 	UpdateBooking(*fiber.Ctx) error
 	DeleteBooking(*fiber.Ctx) error
+	ListAllBookings(*fiber.Ctx) error
 }
 
 type bookingRouter struct {
@@ -29,4 +30,5 @@ func (r *bookingRouter) SetupRoutes() {
 	bookingGroup.Get(":id", r.bookingHandler.GetBookingByID)
 	bookingGroup.Put(":id", r.bookingHandler.UpdateBooking)
 	bookingGroup.Delete(":id", r.bookingHandler.DeleteBooking)
+	bookingGroup.Get("/", r.bookingHandler.ListAllBookings)
 }

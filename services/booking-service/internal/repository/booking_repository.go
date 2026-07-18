@@ -77,3 +77,38 @@ func (b *bookingRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	b.log.Info("Booking deleted successfully")
 	return nil
 }
+
+func (b *bookingRepository) ListAllBookings(ctx context.Context) ([]dto.BookingResponse, error) {
+	query := `SELECT * FROM bookings`
+	b.log.Info("Listing all bookings")
+	rows, err := b.db.QueryContext(ctx, query)
+	if err != nil {
+		b.log.Error("Failed to list bookings", "error", err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+
+	var bookings []dto.BookingResponse
+	for rows.Next() {
+		var booking model.Booking
+		err := rows.Scan(&booking.ID, &booking.PassengerName, &booking.FlightNumber, &booking.Source, &booking.Destination, &booking.Status, &booking.CreatedAt, &booking.UpdatedAt)
+		if err != nil {
+			b.log.Error("Failed to scan booking", "error", err.Error())
+			return nil, err
+		}
+		bookings = append(bookings, dto.BookingResponse{
+			ID:            booking.ID.String(),
+			PassengerName: booking.PassengerName,
+			FlightNumber:  booking.FlightNumber,
+			Source:        booking.Source,
+			Destination:   booking.Destination,
+			Status:        booking.Status,
+		})
+	}
+	if err := rows.Err(); err != nil {
+		b.log.Error("Error iterating over bookings", "error", err.Error())
+		return nil, err
+	}
+	b.log.Info("Bookings listed successfully", "count", len(bookings))
+	return bookings, nil
+}
