@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/RupeshMahanta1994/flightops/shared/config"
+	"github.com/RupeshMahanta1994/flightops/shared/database"
 	"github.com/RupeshMahanta1994/flightops/shared/errors"
 	"github.com/RupeshMahanta1994/flightops/shared/logger"
 	"github.com/RupeshMahanta1994/flightops/shared/response"
@@ -28,6 +29,8 @@ func main() {
 
 	log := logger.New("gateway")
 	log.Info("Application Server started")
+	db, err := database.Init(cfg)
+	fmt.Println("Databse connection successful", db.Stats().OpenConnections, err)
 
 	http.HandleFunc("/success", successHandler(log))
 	// http.HandleFunc("/bad-request", badRequestHandler(log))
