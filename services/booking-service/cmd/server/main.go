@@ -3,6 +3,8 @@ package main
 // This file contains the main function for the booking service server.
 
 import (
+	"os"
+
 	"github.com/RupeshMahanta1994/flightops/booking-service/internal/handler"
 	"github.com/RupeshMahanta1994/flightops/booking-service/internal/repository"
 	"github.com/RupeshMahanta1994/flightops/booking-service/internal/router"
@@ -34,9 +36,9 @@ func main() {
 	app := fiber.New()
 	bookingRouter := router.NewBookingRouter(app, bookingHandler)
 	bookingRouter.SetupRoutes()
-
-	log.Info("Starting server on port 8082")
-	if err := app.Listen(":8082"); err != nil {
-		log.Error("Failed to start server: ", err)
+	port := os.Getenv("BOOKING_PORT")
+	log.Info("Starting server on port " + port)
+	if err := app.Listen(":" + port); err != nil {
+		log.Error("Failed to start server: " + err.Error())
 	}
 }
