@@ -9,6 +9,8 @@ type BookingHandler interface {
 	BookingHelathCheck(*fiber.Ctx) error
 	CreateBooking(*fiber.Ctx) error
 	GetBookingByID(*fiber.Ctx) error
+	UpdateBooking(*fiber.Ctx) error
+	DeleteBooking(*fiber.Ctx) error
 }
 
 type bookingRouter struct {
@@ -25,4 +27,6 @@ func (r *bookingRouter) SetupRoutes() {
 	bookingGroup.Get("/health", r.bookingHandler.BookingHelathCheck)
 	bookingGroup.Post("/", r.bookingHandler.CreateBooking)
 	bookingGroup.Get(":id", r.bookingHandler.GetBookingByID)
+	bookingGroup.Put(":id", r.bookingHandler.UpdateBooking)
+	bookingGroup.Delete(":id", r.bookingHandler.DeleteBooking)
 }

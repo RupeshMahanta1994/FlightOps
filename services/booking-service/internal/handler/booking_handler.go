@@ -68,3 +68,48 @@ func (h *bookingHandler) GetBookingByID(c *fiber.Ctx) error {
 	requestLog.Info("booking fetched", "booking_id", response.ID)
 	return c.JSON(response)
 }
+func (h *bookingHandler) UpdateBooking(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		h.log.Warn("missing booking id")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "id is required"})
+	}
+
+	var req dto.UpdateBookingRequest
+	if err := c.BodyParser(&req); err != nil {
+		h.log.Warn("invalid booking payload", "error", err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	requestLog := logger.WithRequestID(h.log, c.Get(fiber.HeaderXRequestID))
+	requestLog.Info("updating booking", "booking_id", id)
+
+	response, err := h.bookingService.UpdateBooking(id, req.PassengerName, req.FlightNumber, req.Source, req.Destination, req.Status)
+	if err != nil {
+		h.log.Error("failed to update booking", "booking_id", id, "error", err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	requestLog.Info("booking updated", "booking_id", response.ID)
+	return c.JSON(response)
+}
+
+func (h *bookingHandler) DeleteBooking(c *fiber.Ctx) error {
+	id := c.Params("id")
+	if id == "" {
+		h.log.Warn("missing booking id")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "id is required"})
+	}
+
+	requestLog := logger.WithRequestID(h.log, c.Get(fiber.HeaderXRequestID))
+	requestLog.Info("deleting booking", "booking_id", id)
+
+	err := h.bookingService.DeleteBooking(id)
+	if err != nil {
+		h.log.Error("failed to delete booking", "booking_id", id, "error", err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	requestLog.Info("booking deleted", "booking_id", id)
+	return c.SendStatus(fiber.StatusNoContent)
+}

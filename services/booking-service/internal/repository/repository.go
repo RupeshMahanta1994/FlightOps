@@ -11,4 +11,6 @@ import (
 type BookingRepository interface {
 	Create(ctx context.Context, bookings *model.Booking) error
 	GetByID(ctx context.Context, id uuid.UUID) (dto.BookingResponse, error)
+	Update(ctx context.Context, bookings *model.Booking) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }

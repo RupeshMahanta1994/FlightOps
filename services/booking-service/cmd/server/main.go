@@ -24,7 +24,7 @@ func main() {
 	}
 	log.Info("Database connection successful")
 	// Initialize the booking repository
-	repo := repository.NewBookingRepository(db)
+	repo := repository.NewBookingRepository(db, log)
 
 	// Initialize the booking service
 	bookingService := service.NewBookingService(repo, log)

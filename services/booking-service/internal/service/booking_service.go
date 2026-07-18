@@ -61,3 +61,47 @@ func (s *bookingService) GetBookingByID(id string) (dto.BookingResponse, error) 
 	s.log.Info("retrieving booking", "booking_id", id)
 	return s.repo.GetByID(context.Background(), uuid)
 }
+
+func (s *bookingService) UpdateBooking(id, passengerName, flightNumber, source, destination, status string) (*dto.BookingResponse, error) {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		s.log.Warn("invalid booking id", "booking_id", id)
+		return nil, err
+	}
+
+	booking := &model.Booking{
+		ID:            uuid,
+		PassengerName: passengerName,
+		FlightNumber:  flightNumber,
+		Source:        source,
+		Destination:   destination,
+		Status:        status,
+		UpdatedAt:     time.Now(),
+	}
+
+	s.log.Info("updating booking", "booking_id", booking.ID.String())
+	err = s.repo.Update(context.Background(), booking)
+	if err != nil {
+		s.log.Error("repository update failed", "booking_id", booking.ID.String(), "error", err.Error())
+		return nil, err
+	}
+	return &dto.BookingResponse{
+		ID:            booking.ID.String(),
+		PassengerName: booking.PassengerName,
+		FlightNumber:  booking.FlightNumber,
+		Source:        booking.Source,
+		Destination:   booking.Destination,
+		Status:        booking.Status,
+	}, nil
+}
+
+func (s *bookingService) DeleteBooking(id string) error {
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		s.log.Warn("invalid booking id", "booking_id", id)
+		return err
+	}
+
+	s.log.Info("deleting booking", "booking_id", id)
+	return s.repo.Delete(context.Background(), uuid)
+}
