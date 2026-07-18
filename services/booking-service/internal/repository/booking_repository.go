@@ -18,17 +18,25 @@ func NewBookingRepository(db *sql.DB) *bookingRepository {
 }
 
 func (b *bookingRepository) Create(ctx context.Context, booking *model.Booking) error {
-	query := `INSERT INTO bookings(id,passenger_name,flight_number,source,destination,created_at,updated_at)VALUES($1,#2,$3,$4,$5,$6,$7,$8)`
-	_, err := b.db.ExecContext(ctx, query, booking.ID, booking.PassengerName, booking.FlightNumber, booking.Source, booking.Destination, booking.CreatedAt, booking.UpdatedAt)
+	query := `INSERT INTO bookings(id, passenger_name, flight_number, source, destination, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	_, err := b.db.ExecContext(ctx, query, booking.ID, booking.PassengerName, booking.FlightNumber, booking.Source, booking.Destination, booking.Status, booking.CreatedAt, booking.UpdatedAt)
 	return err
 }
 func (b *bookingRepository) GetByID(ctx context.Context, id uuid.UUID) (dto.BookingResponse, error) {
 	query := `SELECT * FROM bookings WHERE id=$1`
 	row := b.db.QueryRowContext(ctx, query, id)
-	var booking dto.BookingResponse
-	err := row.Scan(&booking.ID, &booking.PassengerName, &booking.FlightNumber, &booking.Source, &booking.Destination, &booking.Status)
+	var booking model.Booking
+	err := row.Scan(&booking.ID, &booking.PassengerName, &booking.FlightNumber, &booking.Source, &booking.Destination, &booking.Status, &booking.CreatedAt, &booking.UpdatedAt)
+	var response dto.BookingResponse
+	response.ID = booking.ID.String()
+	response.PassengerName = booking.PassengerName
+	response.FlightNumber = booking.FlightNumber
+	response.Source = booking.Source
+	response.Destination = booking.Destination
+	response.Status = booking.Status
 	if err != nil {
 		return dto.BookingResponse{}, err
 	}
-	return booking, nil
+	return response, nil
+
 }
